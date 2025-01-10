@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fortnite Hub</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        :root {
+            --primary: #4fb3ff;
+            --primary-dark: #3a8ac2;
+            --background: #0a0a0a;
+            --surface: #1a1a1a;
+            --surface-hover: #252525;
+            --text: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --sidebar-width: 250px;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--surface);
+            padding: 2rem 0;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--primary), #ff4f8b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            list-style: none;
+        }
+
+        .nav-link {
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            color: var(--text);
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background-color: var(--surface-hover);
+            color: var(--primary);
+        }
+
+        .nav-link i {
+            width: 24px;
+            margin-right: 0.8rem;
+        }
+
+        .coming-soon {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .welcome-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/api/placeholder/1200/300');
+            background-size: cover;
+            padding: 3rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+        }
+
+        .section {
+            background-color: var(--surface);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .view-all {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .view-all:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .cosmetic-card {
+            background-color: var(--surface-hover);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .cosmetic-image {
+            width: 100%;
+            height: 150px;
+            background-color: var(--surface);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .news-card {
+            background-color: var(--surface-hover);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1000;
+            background-color: var(--primary);
+            border: none;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .preview-section {
+            background-color: var(--surface);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .view-all {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .view-all:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* Cosmetics Preview */
+        .cosmetics-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .cosmetic-card {
+            background-color: var(--surface-hover);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .cosmetic-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .cosmetic-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .cosmetic-info {
+            padding: 1rem;
+        }
+
+        .cosmetic-name {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .cosmetic-type {
+            font-size: 0.9rem;
+            color: var(--primary);
+        }
+
+        /* News Preview */
+        .news-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .news-card {
+            background-color: var(--surface-hover);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .news-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .news-content {
+            padding: 1rem;
+        }
+
+        .news-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .news-body {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--primary);
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Media Queries */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 999;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding-top: 4rem;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+
+        .battle-pass-preview {
+            padding: 1.5rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background-color: var(--surface-hover);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .feature-card i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h4 {
+            margin-bottom: 0.8rem;
+            color: var(--text);
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .battle-pass-cta {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .benefits-list {
+            text-align: left;
+            margin: 1.5rem 0;
+            padding-left: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .benefits-list li {
+            margin-bottom: 0.5rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--primary), #ff4f8b);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <button class="mobile-menu-btn">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">Fortnite Hub</div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="#" class="nav-link coming-soon"><i class="fas fa-flag"></i> Banner (Coming Soon)</a></li>
+            <li><a href="cosmetics.html" class="nav-link"><i class="fas fa-tshirt"></i> Cosmetics</a></li>
+            <li><a href="map.html" class="nav-link"><i class="fas fa-map"></i> Map</a></li>
+            <li><a href="news.html" class="nav-link"><i class="fas fa-newspaper"></i> News</a></li>
+            <li><a href="#" class="nav-link coming-soon"><i class="fas fa-shopping-cart"></i> Shop (Coming Soon)</a></li>
+            <li><a href="stats.html" class="nav-link"><i class="fas fa-chart-bar"></i> Stats</a></li>
+            <li><a href="battlepass.html" class="nav-link"><i class="fas fa-mouse"></i> Battle Pass Tracker</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <section class="welcome-section">
+            <h1>Welcome to Fortnite Hub</h1>
+            <p>Your ultimate destination for everything Fortnite - from cosmetics to latest news!</p>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>What We Offer</h2>
+            </div>
+            <p>Fortnite Hub provides comprehensive information about the game, including detailed cosmetics tracking, interactive map features, latest news updates, and real-time statistics. We're constantly updating our platform to bring you the most accurate and up-to-date Fortnite information.</p>
+        </section>
+
+        <section class="preview-section">
+            <div class="section-header">
+                <h2>Latest Cosmetics</h2>
+                <a href="fortnite/cosmetics.html" class="view-all">View All</a>
+            </div>
+            <div class="cosmetics-preview" id="cosmetics-preview">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    Loading cosmetics...
+                </div>
+            </div>
+        </section>
+
+        <section class="preview-section">
+            <div class="section-header">
+                <h2>Latest News</h2>
+                <a href="fortnite/news.html" class="view-all">View All</a>
+            </div>
+            <div class="news-preview" id="news-preview">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    Loading news...
+                </div>
+            </div>
+        </section>
+
+        <section class="preview-section">
+            <div class="section-header">
+                <h2>Battle Pass Progress Tracker</h2>
+                <!-- <a href="fortnite/battlepass.html" class="view-all">Start Tracking</a> -->
+            </div>
+            <div class="battle-pass-preview">
+                <h3>Track Your Battle Pass Journey</h3>
+                <p>Take control of your Battle Pass progression with our comprehensive tracking system. Our Battle Pass Tracker offers:</p>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-chart-line"></i>
+                        <h4>Progress Visualization</h4>
+                        <p>View your Battle Pass progress through an intuitive visual interface, showing exactly how far you've come and what's ahead.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-tasks"></i>
+                        <h4>Challenge Tracking</h4>
+                        <p>Keep track of all your seasonal challenges, weekly quests, and milestone achievements in one organized location.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-calculator"></i>
+                        <h4>XP Calculator</h4>
+                        <p>Calculate how much XP you need to reach your desired Battle Pass level and estimate the time required to get there.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-clock"></i>
+                        <h4>Time Management</h4>
+                        <p>See how much time is left in the season and plan your progression to ensure you unlock all desired rewards.</p>
+                    </div>
+                </div>
+                <div class="battle-pass-cta">
+                    <h3>Why Use Our Battle Pass Tracker?</h3>
+                    <p>Our Battle Pass Tracker is designed to help you maximize your season progression and ensure you don't miss out on any exclusive rewards. Whether you're aiming for tier 100 or trying to unlock specific cosmetics, our tracker provides:</p>
+                    <ul class="benefits-list">
+                        <li>Daily progress tracking and milestone achievements</li>
+                        <li>Customizable goals and progression paths</li>
+                        <li>Reward preview and unlock date estimations</li>
+                        <li>Challenge completion suggestions and strategies</li>
+                        <li>Season-specific statistics and performance metrics</li>
+                    </ul>
+                    <a href="fortnite/battlepass.html" class="cta-button">Start Tracking Your Progress</a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        const menuBtn = document.querySelector('.mobile-menu-btn');
+        const sidebar = document.querySelector('.sidebar');
+
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(e.target) && 
+                !menuBtn.contains(e.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Configuration settings
+        const SETTINGS = {
+            cosmetics: {
+                maxItems: 5,                   // Number of cosmetics to display
+                sortBy: 'added',              // Sort by: 'added', 'name', 'rarity'
+                showRarity: false,             // Show rarity in cosmetic cards
+                enableHoverEffect: true,      // Enable hover animation
+                loadingTimeout: 5000,         // Timeout for loading in ms
+                errorRetries: 1               // Number of retries on failed fetch
+            },
+            news: {
+                maxItems: 3,                  // Number of news items to display
+                excerptLength: 150,           // Length of news excerpt in characters
+                showDate: true,               // Show publication date
+                enableImageZoom: true,        // Enable image zoom on hover
+                loadingTimeout: 5000          // Timeout for loading in ms
+            }
+        };
+
+        // Modified cosmetics fetch function
+        async function fetchLatestCosmetics() {
+            let retries = SETTINGS.cosmetics.errorRetries;
+            
+            while (retries >= 0) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), SETTINGS.cosmetics.loadingTimeout);
+                    
+                    const response = await fetch('https://fortnite-api.com/v2/cosmetics/br', {
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeoutId);
+                    
+                    const data = await response.json();
+                    
+                    // Sort cosmetics based on settings
+                    let sortedCosmetics = data.data.sort((a, b) => {
+                        switch (SETTINGS.cosmetics.sortBy) {
+                            case 'name':
+                                return a.name.localeCompare(b.name);
+                            case 'rarity':
+                                return b.rarity.value - a.rarity.value;
+                            default:
+                                return new Date(b.added) - new Date(a.added);
+                        }
+                    });
+                    
+                    // Get specified number of cosmetics
+                    const latestCosmetics = sortedCosmetics.slice(0, SETTINGS.cosmetics.maxItems);
+                    displayCosmetics(latestCosmetics);
+                    break;
+                } catch (error) {
+                    retries--;
+                    if (retries < 0) {
+                        console.error('Error fetching cosmetics:', error);
+                        document.getElementById('cosmetics-preview').innerHTML = 
+                            '<div class="error">Failed to load cosmetics. Please try again later.</div>';
+                    }
+                }
+            }
+        }
+
+        // Modified cosmetics display function
+        function displayCosmetics(cosmetics) {
+            const container = document.getElementById('cosmetics-preview');
+            container.innerHTML = '';
+
+            cosmetics.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'cosmetic-card';
+                if (SETTINGS.cosmetics.enableHoverEffect) {
+                    card.classList.add('hover-effect');
+                }
+                
+                let rarityHtml = SETTINGS.cosmetics.showRarity ? 
+                    `<div class="cosmetic-rarity" style="color: ${item.rarity.color}">${item.rarity.displayValue}</div>` : '';
+                
+                card.innerHTML = `
+                    <img class="cosmetic-image" src="${item.images.icon}" alt="${item.name}"
+                        onerror="this.src='/api/placeholder/200/200'">
+                    <div class="cosmetic-info">
+                        <div class="cosmetic-name">${item.name}</div>
+                        <div class="cosmetic-type">${item.type.displayValue}</div>
+                        ${rarityHtml}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Modified news fetch function
+        async function fetchLatestNews() {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), SETTINGS.news.loadingTimeout);
+                
+                const response = await fetch('https://fortnite-api.com/v2/news/br', {
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                
+                const data = await response.json();
+                const latestNews = data.data.motds.slice(0, SETTINGS.news.maxItems);
+                displayNews(latestNews);
+            } catch (error) {
+                console.error('Error fetching news:', error);
+                document.getElementById('news-preview').innerHTML = 
+                    '<div class="error">Failed to load news. Please try again later.</div>';
+            }
+        }
+
+        // Modified news display function
+        function displayNews(news) {
+            const container = document.getElementById('news-preview');
+            container.innerHTML = '';
+
+            news.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'news-card';
+                
+                const truncatedBody = item.body.length > SETTINGS.news.excerptLength ? 
+                    item.body.substring(0, SETTINGS.news.excerptLength) + '...' : 
+                    item.body;
+                
+                const dateHtml = SETTINGS.news.showDate ? 
+                    `<div class="news-date">${new Date(item.tabTitle).toLocaleDateString()}</div>` : '';
+                
+                const imageClass = SETTINGS.news.enableImageZoom ? 'news-image zoom-effect' : 'news-image';
+                
+                card.innerHTML = `
+                    <img class="${imageClass}" src="${item.image}" alt="${item.title}">
+                    <div class="news-content">
+                        <h3 class="news-title">${item.title}</h3>
+                        ${dateHtml}
+                        <p class="news-body">${truncatedBody}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Initialize
+        fetchLatestCosmetics();
+        fetchLatestNews();
+    </script>
+</body>
+</html>

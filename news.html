@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fortnite News</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        :root {
+            --primary: #4fb3ff;
+            --primary-dark: #3a8ac2;
+            --background: #0a0a0a;
+            --surface: #1a1a1a;
+            --surface-hover: #252525;
+            --text: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background-color: var(--surface);
+            padding: 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .header-title {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, var(--primary), #ff4f8b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .description {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem auto;
+        }
+
+        .tab-button {
+            /* background-color: var(--surface);
+            color: var(--text);
+            padding: 1rem 2rem;
+            border: 2px solid var(--primary);
+            text-transform: uppercase;
+            cursor: pointer;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+            transition: all 0.3s ease; */
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            border: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tab-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* .tab-button a {
+            text-decoration: none;
+            color: var(--text);
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: block;
+            margin-top: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .tab-button a:hover {
+            color: var(--primary);
+        } */
+
+        .tab-button.active {
+            background-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(79, 179, 255, 0.3);
+        }
+
+        .news-section {
+            max-width: 1400px;
+            margin: 2rem auto;
+            display: none;
+        }
+
+        .news-section.active {
+            display: block;
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .news-card {
+            background: var(--surface);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .news-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .news-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .news-content {
+            padding: 1.5rem;
+        }
+
+        .news-content h2 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .news-content p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .header-title {
+                font-size: 2rem;
+            }
+
+            .tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1 class="header-title">Fortnite News</h1>
+        </div>
+    </div>
+
+    <div class="description">
+        Stay updated with the latest news from Fortnite! Choose a category below to explore Battle Royale, Save the World, and Creative news.
+    </div>
+
+    <div class="tabs">
+        <a class="tab-button active" data-tab="br">Battle Royale</a>
+        <a class="tab-button" data-tab="stw">Save the World</a>
+        <a class="tab-button" data-tab="creative">Creative</a>
+    </div>
+
+    <div id="br" class="news-section active">
+        <div class="news-grid" id="br-grid">
+            <div class="loading">Loading Battle Royale News...</div>
+        </div>
+    </div>
+
+    <div id="stw" class="news-section">
+        <div class="news-grid" id="stw-grid">
+            <div class="loading">Loading Save the World News...</div>
+        </div>
+    </div>
+
+    <div id="creative" class="news-section">
+        <div class="news-grid" id="creative-grid">
+            <div class="loading">Loading Creative News...</div>
+        </div>
+    </div>
+
+    <script>
+        const newsEndpoints = {
+            br: 'https://fortnite-api.com/v2/news/br',
+            stw: 'https://fortnite-api.com/v2/news/stw',
+            creative: 'https://fortnite-api.com/v2/news/creative'
+        };
+
+        async function fetchNews(type) {
+            try {
+                const response = await fetch(newsEndpoints[type]);
+                if (!response.ok) throw new Error('Failed to fetch news');
+
+                const data = await response.json();
+                displayNews(type, data.data);
+            } catch (error) {
+                console.error('Error fetching news:', error);
+                document.getElementById(`${type}-grid`).innerHTML = '<div class="error">Failed to load news. Please try again later.</div>';
+            }
+        }
+
+        function displayNews(type, newsData) {
+            const grid = document.getElementById(`${type}-grid`);
+            grid.innerHTML = '';
+
+            if (!newsData || !newsData.motds || newsData.motds.length === 0) {
+                grid.innerHTML = '<div class="error">No news available.</div>';
+                return;
+            }
+
+            newsData.motds.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'news-card';
+                card.innerHTML = `
+                    <img src="${item.image}" alt="${item.title}">
+                    <div class="news-content">
+                        <h2>${item.title}</h2>
+                        <p>${item.body}</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        const tabs = document.querySelectorAll('.tab-button');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(btn => btn.classList.remove('active'));
+                tab.classList.add('active');
+
+                document.querySelectorAll('.news-section').forEach(section => section.classList.remove('active'));
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        Object.keys(newsEndpoints).forEach(fetchNews);
+    </script>
+</body>
+</html>

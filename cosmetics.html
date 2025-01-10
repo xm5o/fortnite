@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fortnite Cosmetics Explorer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        :root {
+            --primary: #4fb3ff;
+            --primary-dark: #3a8ac2;
+            --background: #0a0a0a;
+            --surface: #1a1a1a;
+            --surface-hover: #252525;
+            --text: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: var(--surface);
+            padding: clamp(1rem, 4vw, 2rem);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .header-content {
+            max-width: min(1400px, 95%);
+            margin: 0 auto;
+        }
+
+        .header-title {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--primary), #ff4f8b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: clamp(0.5rem, 2vw, 1rem);
+            margin-top: 1.5rem;
+        }
+
+        .stat-item {
+            background: rgba(79, 179, 255, 0.1);
+            padding: clamp(0.75rem, 2vw, 1rem);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .search-section {
+            background: var(--surface);
+            padding: clamp(1rem, 3vw, 1.5rem);
+            position: sticky;
+            top: 90px;
+            z-index: 90;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .search-container {
+            max-width: min(1400px, 95%);
+            margin: 0 auto;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: clamp(0.8rem, 2vw, 1.2rem);
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: var(--text);
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .filters {
+            display: flex;
+            gap: clamp(0.4rem, 1vw, 0.75rem);
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-button {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            border: none;
+            padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(0.8rem, 2vw, 1.25rem);
+            font-size: clamp(0.7rem, 1.5vw, 0.9rem);
+            white-space: nowrap;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .filter-button.active {
+            background-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(79, 179, 255, 0.3);
+        }
+
+        .sort-container {
+            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .sort-button {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .sort-button.active {
+            color: var(--primary);
+            background: rgba(79, 179, 255, 0.1);
+        }
+
+        .cosmetics-container {
+            max-width: min(1400px, 95%);
+            margin: 2rem auto;
+            padding: 0 clamp(0.5rem, 2vw, 1.5rem);
+        }
+
+        .cosmetics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+            gap: clamp(1rem, 3vw, 2rem);
+            margin-bottom: 3rem;
+        }
+
+        .cosmetic-card {
+            max-width: 100%;
+            background-color: var(--surface);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .cosmetic-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .cosmetic-image-container {
+            position: relative;
+            padding-top: 100%;
+            background: linear-gradient(45deg, rgba(0,0,0,0.1), rgba(255,255,255,0.1));
+        }
+
+        .cosmetic-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .cosmetic-card:hover .cosmetic-image {
+            transform: scale(1.1);
+        }
+
+        .cosmetic-info {
+            padding: clamp(1rem, 3vw, 1.5rem);
+            background: linear-gradient(0deg, var(--surface) 0%, rgba(26,26,26,0.8) 100%);
+        }
+
+        .cosmetic-type {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        .cosmetic-name {
+            font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .filter-button, .sort-button, .close-modal {
+            min-height: 44px;
+            min-width: 44px;
+        }
+
+        .cosmetic-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cosmetic-rarity {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .rarity-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        .cosmetic-date {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .new-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: linear-gradient(45deg, #ff4f4f, #ff4f8b);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(255, 79, 79, 0.4);
+            z-index: 1;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            border-radius: 20px;
+            width: min(95%, 800px);
+            max-height: 90vh;
+            overflow-y: auto;
+            max-width: 800px;
+            position: relative;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            animation: modalOpen 0.3s ease-out;
+        }
+
+        @keyframes modalOpen {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            padding: clamp(1rem, 3vw, 2rem);
+            background: linear-gradient(45deg, var(--surface), rgba(26,26,26,0.8));
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .modal-image {
+            width: clamp(60px, 15vw, 100px);
+            height: clamp(60px, 15vw, 100px);
+            margin-right: clamp(1rem, 3vw, 2rem);
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
+        .modal-title-container {
+            flex-grow: 1;
+        }
+
+        .modal-subtitle {
+            color: var(--primary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-title {
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            justify-items: center;
+            font-size: 1.5rem;
+        }
+
+        .close-modal:hover {
+            background: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+            gap: clamp(0.8rem, 2vw, 1.5rem);
+        }
+
+        .detail-item {
+            background: rgba(255,255,255,0.03);
+            padding: 1.5rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .detail-item:hover {
+            background: rgba(255,255,255,0.05);
+            transform: translateY(-2px);
+        }
+
+        .detail-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-value {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .load-more, .scroll-to-top {
+            padding: clamp(0.8rem, 2vw, 1rem) clamp(1.5rem, 4vw, 2.5rem);
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            border-radius: clamp(8px, 2vw, 12px);
+        }
+
+        .load-more {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(79, 179, 255, 0.3);
+        }
+
+        .load-more:hover {
+            transform: translateX(-50%) translateY(-3px);
+            box-shadow: 0 6px 25px rgba(79, 179, 255, 0.4);
+        }
+
+        .loading {
+            text-align: center;
+            padding: clamp(2rem, 5vw, 3rem);
+            color: var(--text-secondary);
+        }
+
+        .loading-spinner {
+            width: clamp(30px, 8vw, 40px);
+            height: clamp(30px, 8vw, 40px);
+            border: 4px solid var(--primary);
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+
+        .scroll-to-top {
+            position: fixed;
+            bottom: clamp(1rem, 4vw, 4rem);
+            right: clamp(1rem, 4vw, 2rem);
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            display: none;
+            box-shadow: 0 4px 20px rgba(79, 179, 255, 0.3);
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .scroll-to-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(79, 179, 255, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 1.5rem 1rem;
+                position: static;
+            }
+
+            .header-title {
+                font-size: 2rem;
+            }
+
+            .search-section {
+                padding: 1rem;
+                position:static;
+            }
+
+            .search-bar {
+                padding: 1rem;
+                font-size: 1rem;
+            }
+
+            .filter-button {
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+            }
+
+            .cosmetics-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .modal-content {
+                width: 95%;
+            }
+
+            .modal-header {
+                padding: 1.5rem;
+            }
+
+            .modal-image {
+                width: 80px;
+                height: 80px;
+                margin-right: 1.5rem;
+            }
+
+            .modal-title {
+                font-size: 1.5rem;
+            }
+
+            .load-more {
+                bottom: 5rem;
+            }
+
+            .scroll-to-top {
+                right: 1rem;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .cosmetic-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+
+            .sort-container {
+                flex-wrap: wrap;
+                justify-content: flex-start;
+            }
+
+            .modal-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .modal-image {
+                margin: 0 auto 1rem;
+            }
+        }
+
+        /* Better Touch Scrolling */
+        @media (hover: none) {
+            .cosmetics-grid {
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .modal-content {
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1 class="header-title">Fortnite Cosmetics Explorer</h1>
+            <div class="stats-container">
+                <div class="stat-item">
+                    <div class="stat-label">Total Items</div>
+                    <div class="stat-value" id="total-count">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Filtered Items</div>
+                    <div class="stat-value" id="filtered-count">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">New Items</div>
+                    <div class="stat-value" id="new-count">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Rarity Types</div>
+                    <div class="stat-value" id="rarity-count">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="search-section">
+        <div class="search-container">
+            <input type="text" class="search-bar" placeholder="Search cosmetics by name, type, or rarity...">
+            
+            <div class="filters">
+                <button class="filter-button active" data-type="all">All</button>
+                <button class="filter-button" data-type="outfit">Outfits</button>
+                <button class="filter-button" data-type="backpack">Back Blings</button>
+                <button class="filter-button" data-type="pickaxe">Pickaxes</button>
+                <button class="filter-button" data-type="glider">Gliders</button>
+                <button class="filter-button" data-type="emote">Emotes</button>
+                <button class="filter-button" data-type="wrap">Wraps</button>
+                <button class="filter-button" data-type="music">Music</button>
+                <button class="filter-button" data-type="contrail">Contrails</button>
+                <button class="filter-button" data-type="loading">Loading Screens</button>
+                <button class="filter-button" data-type="other">Other</button>
+            </div>
+
+            <div class="sort-container">
+                <button class="sort-button active" data-sort="newest">Newest</button>
+                <button class="sort-button" data-sort="oldest">Oldest</button>
+                <button class="sort-button" data-sort="name">Name</button>
+                <button class="sort-button" data-sort="rarity">Rarity</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="cosmetics-container">
+        <div class="cosmetics-grid"></div>
+    </div>
+
+    <button class="load-more">Load More</button>
+
+    <button class="scroll-to-top">Top</button>
+
+    <div class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <img class="modal-image" src="" alt="">
+                <div class="modal-title-container">
+                    <div class="modal-subtitle"></div>
+                    <h2 class="modal-title"></h2>
+                </div>
+                <button class="close-modal">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Source</div>
+                        <div class="detail-value source"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Introduced In</div>
+                        <div class="detail-value introduced"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Release Date</div>
+                        <div class="detail-value release-date"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Last Seen</div>
+                        <div class="detail-value last-seen"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Rarity</div>
+                        <div class="detail-value rarity"></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Cosmetic ID</div>
+                        <div class="detail-value cosmetic-id"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allCosmetics = [];
+        let currentFilter = 'all';
+        let currentSort = 'newest';
+        let searchTerm = '';
+        let currentPage = 0;
+        const itemsPerPage = 24;
+        let isLoading = false;
+
+        const rarityColors = {
+            common: '#b1b1b1',
+            uncommon: '#60aa3a',
+            rare: '#49acf2',
+            epic: '#b15be2',
+            legendary: '#d37841',
+            mythic: '#e4b031',
+            marvel: '#e53935',
+            dc: '#4c8dae',
+            icon: '#49acf2',
+            gaming: '#bb86fc',
+            starwars: '#2196f3'
+        };
+
+        async function fetchCosmetics() {
+            try {
+                const response = await fetch('https://fortnite-api.com/v2/cosmetics/br');
+                const data = await response.json();
+                
+                allCosmetics = data.data;
+                updateStats();
+                sortCosmetics();
+                renderCosmetics(true);
+            } catch (error) {
+                console.error('Error fetching cosmetics:', error);
+                document.querySelector('.cosmetics-grid').innerHTML = `
+                    <div class="no-results">
+                        Error loading cosmetics. Please try again later.
+                    </div>
+                `;
+            }
+        }
+
+        function updateStats() {
+            const filteredCosmetics = getFilteredCosmetics();
+            const newItems = allCosmetics.filter(cosmetic => isNewCosmetic(cosmetic.added));
+            const rarityTypes = new Set(allCosmetics.map(c => c.rarity.value));
+            
+            document.getElementById('total-count').textContent = allCosmetics.length.toLocaleString();
+            document.getElementById('filtered-count').textContent = filteredCosmetics.length.toLocaleString();
+            document.getElementById('new-count').textContent = newItems.length.toLocaleString();
+            document.getElementById('rarity-count').textContent = rarityTypes.size.toString();
+        }
+
+        function sortCosmetics() {
+            const filteredCosmetics = getFilteredCosmetics();
+            
+            switch(currentSort) {
+                case 'newest':
+                    filteredCosmetics.sort((a, b) => new Date(b.added) - new Date(a.added));
+                    break;
+                case 'oldest':
+                    filteredCosmetics.sort((a, b) => new Date(a.added) - new Date(b.added));
+                    break;
+                case 'name':
+                    filteredCosmetics.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+                case 'rarity':
+                    filteredCosmetics.sort((a, b) => b.rarity.value.localeCompare(a.rarity.value));
+                    break;
+            }
+
+            return filteredCosmetics;
+        }
+
+        function getFilteredCosmetics() {
+            return allCosmetics.filter(cosmetic => {
+                const matchesFilter = currentFilter === 'all' || 
+                    (currentFilter === 'other' ? 
+                        !['outfit', 'backpack', 'pickaxe', 'glider', 'emote', 'wrap', 'music', 'contrail', 'loading']
+                            .includes(cosmetic.type.value.toLowerCase()) :
+                        cosmetic.type.value.toLowerCase() === currentFilter);
+
+                const searchableText = `${cosmetic.name} ${cosmetic.type.value} ${cosmetic.rarity.value}`.toLowerCase();
+                const matchesSearch = searchableText.includes(searchTerm.toLowerCase());
+
+                return matchesFilter && matchesSearch;
+            });
+        }
+
+        function isNewCosmetic(added) {
+            const now = new Date();
+            const cosmeticDate = new Date(added);
+            const daysDifference = (now - cosmeticDate) / (1000 * 60 * 60 * 24);
+            return daysDifference <= 7;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+
+        function getRarityColor(rarity) {
+            const rarityLower = rarity.toLowerCase();
+            return rarityColors[rarityLower] || '#b1b1b1';
+        }
+
+        function showItemDetails(cosmetic) {
+            const modal = document.querySelector('.modal');
+            
+            modal.querySelector('.modal-image').src = cosmetic.images.icon;
+            modal.querySelector('.modal-subtitle').textContent = cosmetic.type.displayValue;
+            modal.querySelector('.modal-title').textContent = cosmetic.name;
+            
+            modal.querySelector('.source').textContent = cosmetic.introduction?.text || 'Unknown';
+            modal.querySelector('.introduced').textContent = 
+                `Chapter ${cosmetic.introduction?.chapter || '?'}, Season ${cosmetic.introduction?.season || '?'}`;
+            modal.querySelector('.release-date').textContent = formatDate(cosmetic.added);
+            modal.querySelector('.last-seen').textContent = cosmetic.shopHistory?.length ? 
+                formatDate(cosmetic.shopHistory[cosmetic.shopHistory.length - 1]) : 'Never';
+            modal.querySelector('.rarity').textContent = cosmetic.rarity.displayValue;
+            modal.querySelector('.rarity').style.color = getRarityColor(cosmetic.rarity.value);
+            modal.querySelector('.cosmetic-id').textContent = cosmetic.id;
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function renderCosmetics(reset = false) {
+            if (isLoading) return;
+            isLoading = true;
+
+            const grid = document.querySelector('.cosmetics-grid');
+            if (reset) {
+                grid.innerHTML = '<div class="loading"><div class="loading-spinner"></div>Loading cosmetics...</div>';
+                currentPage = 0;
+            }
+
+            const filteredCosmetics = sortCosmetics();
+            const start = currentPage * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageItems = filteredCosmetics.slice(start, end);
+
+            if (reset) {
+                grid.innerHTML = '';
+                if (filteredCosmetics.length === 0) {
+                    grid.innerHTML = '<div class="no-results">No cosmetics found matching your criteria</div>';
+                    document.querySelector('.load-more').style.display = 'none';
+                    isLoading = false;
+                    return;
+                }
+            }
+
+            pageItems.forEach(cosmetic => {
+                const card = document.createElement('div');
+                card.className = 'cosmetic-card';
+                
+                const rarityColor = getRarityColor(cosmetic.rarity.value);
+                const isNew = isNewCosmetic(cosmetic.added);
+                
+                card.innerHTML = `
+                    ${isNew ? '<div class="new-badge">New</div>' : ''}
+                    <div class="cosmetic-image-container">
+                        <img class="cosmetic-image" src="${cosmetic.images.icon}" alt="${cosmetic.name}" 
+                            onerror="this.src='/api/placeholder/400/400'">
+                    </div>
+                    <div class="cosmetic-info">
+                        <div class="cosmetic-type">${cosmetic.type.displayValue}</div>
+                        <div class="cosmetic-name">${cosmetic.name}</div>
+                        <div class="cosmetic-meta">
+                            <div class="cosmetic-rarity">
+                                <span class="rarity-dot" style="background-color: ${rarityColor}"></span>
+                                ${cosmetic.rarity.displayValue}
+                            </div>
+                            <div class="cosmetic-date">${formatDate(cosmetic.added)}</div>
+                        </div>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => showItemDetails(cosmetic));
+                grid.appendChild(card);
+            });
+
+            document.querySelector('.load-more').style.display = 
+                end >= filteredCosmetics.length ? 'none' : 'block';
+            
+            isLoading = false;
+        }
+
+        // Event Listeners
+        document.querySelectorAll('.filter-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                if (isLoading) return;
+                
+                document.querySelectorAll('.filter-button').forEach(btn => 
+                    btn.classList.remove('active')
+                );
+                e.target.classList.add('active');
+                currentFilter = e.target.dataset.type;
+                renderCosmetics(true);
+                updateStats();
+            });
+        });
+
+        document.querySelectorAll('.sort-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                if (isLoading) return;
+                
+                document.querySelectorAll('.sort-button').forEach(btn => 
+                    btn.classList.remove('active')
+                );
+                e.target.classList.add('active');
+                currentSort = e.target.dataset.sort;
+                renderCosmetics(true);
+            });
+        });
+
+        const debouncedSearch = debounce((e) => {
+            searchTerm = e.target.value;
+            renderCosmetics(true);
+            updateStats();
+        }, 300);
+
+        document.querySelector('.search-bar').addEventListener('input', debouncedSearch);
+
+        document.querySelector('.load-more').addEventListener('click', () => {
+            if (!isLoading) {
+                currentPage++;
+                renderCosmetics();
+            }
+        });
+
+        document.querySelector('.close-modal').addEventListener('click', () => {
+            document.querySelector('.modal').classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        document.querySelector('.modal').addEventListener('click', (e) => {
+            if (e.target === document.querySelector('.modal')) {
+                document.querySelector('.modal').classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelector('.modal').classList.remove('active');
+                document.body.style.overflow = '';
+                if (document.activeElement === document.querySelector('.search-bar')) {
+                    document.querySelector('.search-bar').blur();
+                }
+            }
+        });
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Initialize
+        fetchCosmetics();
+
+        $(document).ready(function() {
+            const loadMoreButton = $('.load-more');
+            const scrollToTopButton = $('.scroll-to-top');
+
+            function toggleScrollButtons() {
+                const scrollTop = $(window).scrollTop();
+                const docHeight = $(document).height();
+                const winHeight = $(window).height();
+
+                // Show/hide Load More button near bottom
+                if (scrollTop + winHeight >= docHeight - 100) {
+                    loadMoreButton.fadeIn();
+                } else {
+                    loadMoreButton.fadeOut();
+                }
+
+                // Show/hide Scroll to Top button
+                if (scrollTop > 200) {
+                    scrollToTopButton.fadeIn();
+                } else {
+                    scrollToTopButton.fadeOut();
+                }
+            }
+
+            // Scroll to top when button clicked
+            scrollToTopButton.click(function() {
+                $('html, body').animate({ scrollTop: 0 }, 500);
+            });
+
+            // Attach scroll event
+            $(window).on('scroll', toggleScrollButtons);
+
+            // Initial state
+            toggleScrollButtons();
+        });
+    </script>
+</body>
+</html>
