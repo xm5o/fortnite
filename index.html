@@ -395,13 +395,13 @@
         </div>
         <ul class="nav-links">
             <li><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
-            <li><a href="#" class="nav-link coming-soon"><i class="fas fa-flag"></i> Banner (Coming Soon)</a></li>
             <li><a href="cosmetics.html" class="nav-link"><i class="fas fa-tshirt"></i> Cosmetics</a></li>
             <li><a href="map.html" class="nav-link"><i class="fas fa-map"></i> Map</a></li>
             <li><a href="news.html" class="nav-link"><i class="fas fa-newspaper"></i> News</a></li>
-            <li><a href="#" class="nav-link coming-soon"><i class="fas fa-shopping-cart"></i> Shop (Coming Soon)</a></li>
             <li><a href="stats.html" class="nav-link"><i class="fas fa-chart-bar"></i> Stats</a></li>
             <li><a href="battlepass.html" class="nav-link"><i class="fas fa-mouse"></i> Battle Pass Tracker</a></li>
+            <li><a href="#" class="nav-link coming-soon"><i class="fas fa-flag"></i> Banner (Coming Soon)</a></li>
+            <li><a href="#" class="nav-link coming-soon"><i class="fas fa-shopping-cart"></i> Shop (Coming Soon)</a></li>
         </ul>
     </nav>
 
@@ -513,19 +513,19 @@
         // Configuration settings
         const SETTINGS = {
             cosmetics: {
-                maxItems: 5,                   // Number of cosmetics to display
-                sortBy: 'added',              // Sort by: 'added', 'name', 'rarity'
-                showRarity: false,             // Show rarity in cosmetic cards
-                enableHoverEffect: true,      // Enable hover animation
-                loadingTimeout: 5000,         // Timeout for loading in ms
-                errorRetries: 1               // Number of retries on failed fetch
+                maxItems:           4,                   // Number of cosmetics to display
+                sortBy:             'added',              // Sort by: 'added', 'name', 'rarity'
+                showRarity:         false,             // Show rarity in cosmetic cards
+                enableHoverEffect:  true,      // Enable hover animation
+                loadingTimeout:     5000,         // Timeout for loading in ms
+                errorRetries:       1               // Number of retries on failed fetch
             },
             news: {
-                maxItems: 3,                  // Number of news items to display
-                excerptLength: 150,           // Length of news excerpt in characters
-                showDate: true,               // Show publication date
-                enableImageZoom: true,        // Enable image zoom on hover
-                loadingTimeout: 5000          // Timeout for loading in ms
+                maxItems:           2,                  // Number of news items to display
+                excerptLength:      150,           // Length of news excerpt in characters
+                showDate:           false,               // Show publication date
+                enableImageZoom:    true,        // Enable image zoom on hover
+                loadingTimeout:     5000          // Timeout for loading in ms
             }
         };
 
