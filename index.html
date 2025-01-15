@@ -5,79 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fortnite Hub</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        }
-
-        :root {
-            --primary: #4fb3ff;
-            --primary-dark: #3a8ac2;
-            --background: #0a0a0a;
-            --surface: #1a1a1a;
-            --surface-hover: #252525;
-            --text: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.7);
-            --sidebar-width: 250px;
-        }
-
-        body {
-            background-color: var(--background);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-        }
-
-        /* Sidebar Styles */
-        .sidebar {
-            width: var(--sidebar-width);
-            background-color: var(--surface);
-            padding: 2rem 0;
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-        }
-
-        .sidebar-header {
-            padding: 0 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .sidebar-logo {
-            font-size: 1.8rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, var(--primary), #ff4f8b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .nav-links {
-            list-style: none;
-        }
-
-        .nav-link {
-            padding: 1rem 1.5rem;
-            display: flex;
-            align-items: center;
-            color: var(--text);
-            text-decoration: none;
-            transition: background-color 0.3s ease;
-        }
-
-        .nav-link:hover {
-            background-color: var(--surface-hover);
-            color: var(--primary);
-        }
-
-        .nav-link i {
-            width: 24px;
-            margin-right: 0.8rem;
-        }
-
         .coming-soon {
             opacity: 0.5;
             cursor: not-allowed;
@@ -88,20 +17,31 @@
             margin-left: var(--sidebar-width);
             flex: 1;
             padding: 2rem;
+            width: 100%;
         }
 
         .welcome-section {
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/api/placeholder/1200/300');
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://fnggcdn.com/assets/YhEONm.png');
             background-size: cover;
-            padding: 3rem;
+            background-position: center;
+            padding: 2rem;
             border-radius: 16px;
             margin-bottom: 2rem;
+        }
+
+        .welcome-section h1 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            margin-bottom: 1rem;
+        }
+
+        .welcome-section p {
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
         }
 
         .section {
             background-color: var(--surface);
             border-radius: 16px;
-            padding: 2rem;
+            padding: 1.5rem;
             margin-bottom: 2rem;
         }
 
@@ -154,19 +94,7 @@
         }
 
         /* Mobile Menu Button */
-        .mobile-menu-btn {
-            display: none;
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
-            z-index: 1000;
-            background-color: var(--primary);
-            border: none;
-            color: white;
-            padding: 0.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-        }
+        
 
         .preview-section {
             background-color: var(--surface);
@@ -295,25 +223,46 @@
             to { transform: rotate(360deg); }
         }
 
+        @media (max-width: 1024px) {
+            .features-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+
         /* Media Queries */
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-                z-index: 999;
+            .section {
+                padding: 1rem;
             }
 
-            .sidebar.active {
-                transform: translateX(0);
+            .welcome-section {
+                padding: 1.5rem;
             }
 
-            .main-content {
-                margin-left: 0;
-                padding-top: 4rem;
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .cosmetics-preview, .news-preview {
+                grid-template-columns: 1fr;
             }
 
-            .mobile-menu-btn {
-                display: block;
+            .section-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .view-all {
+                width: 100%;
+                text-align: center;
+            }
+
+            .battle-pass-cta .cta-button {
+                width: 100%;
+                text-align: center;
             }
         }
 
@@ -323,16 +272,33 @@
 
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
         }
 
         .feature-card {
             background-color: var(--surface-hover);
-            padding: 1.5rem;
+            padding: 1.25rem;
             border-radius: 12px;
             text-align: center;
+        }
+
+        .cosmetics-preview, .news-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+        }
+
+        .cosmetic-card, .news-card {
+            width: 100%;
+            height: 100%;
+        }
+
+        .cosmetic-image, .news-image {
+            aspect-ratio: 1;
+            object-fit: cover;
+            width: 100%;
+            height: auto;
         }
 
         .feature-card i {
@@ -394,14 +360,13 @@
             <div class="sidebar-logo">Fortnite Hub</div>
         </div>
         <ul class="nav-links">
-            <li><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="index.html" class="nav-link active"><i class="fas fa-home"></i> Home</a></li>
             <li><a href="cosmetics.html" class="nav-link"><i class="fas fa-tshirt"></i> Cosmetics</a></li>
             <li><a href="map.html" class="nav-link"><i class="fas fa-map"></i> Map</a></li>
             <li><a href="news.html" class="nav-link"><i class="fas fa-newspaper"></i> News</a></li>
             <li><a href="stats.html" class="nav-link"><i class="fas fa-chart-bar"></i> Stats</a></li>
-            <li><a href="battlepass.html" class="nav-link"><i class="fas fa-mouse"></i> Battle Pass Tracker</a></li>
-            <li><a href="#" class="nav-link coming-soon"><i class="fas fa-flag"></i> Banner (Coming Soon)</a></li>
-            <li><a href="#" class="nav-link coming-soon"><i class="fas fa-shopping-cart"></i> Shop (Coming Soon)</a></li>
+            <li><a href="battlepass.html" class="nav-link"><i class="fas fa-star"></i> Battle Pass Tracker</a></li>
+            <li><a href="aes.html" class="nav-link"><i class="fas fa-key"></i> AES Keys</a></li>
         </ul>
     </nav>
 
@@ -493,6 +458,15 @@
     </div>
 
     <script>
+        import('./js/settings-manager.js')
+            .then(module => {
+                window.SettingsManager = module.default;
+            })
+            .catch(err => console.error('Error loading settings manager:', err));
+    </script>
+    <script src="js/settings.js"></script>
+
+    <script>
         // Mobile menu toggle
         const menuBtn = document.querySelector('.mobile-menu-btn');
         const sidebar = document.querySelector('.sidebar');
@@ -513,7 +487,7 @@
         // Configuration settings
         const SETTINGS = {
             cosmetics: {
-                maxItems:           4,                   // Number of cosmetics to display
+                maxItems:           5,                   // Number of cosmetics to display
                 sortBy:             'added',              // Sort by: 'added', 'name', 'rarity'
                 showRarity:         false,             // Show rarity in cosmetic cards
                 enableHoverEffect:  true,      // Enable hover animation
