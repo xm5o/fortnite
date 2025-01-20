@@ -357,7 +357,7 @@
                 </div>
             </section>
 
-            <section class="section">
+            <section class="section" style="display: none;">
                 <h2>Challenge Tracking</h2>
                 <div class="challenge-grid" id="challengeGrid">
                     <!-- Challenges will be populated here -->
@@ -551,15 +551,17 @@
         // Season data
         const seasonData = {
             startDate: '2025-01-01',
-            endDate: '2025-03-15',
+            endDate: '2025-02-21',
             xpPerLevel: 80000
         };
 
         // Challenge tracking
         const challenges = [
             { name: 'Weekly Challenges', total: 10, completed: 0, xp: 20000 },
-            { name: 'Daily Quests', total: 3, completed: 0, xp: 1000 },
-            { name: 'Milestone Challenges', total: 20, completed: 0, xp: 15000 }
+            { name: 'Daily Quests', total: 3, completed: 0, xp: 25000 },
+            { name: 'Ballistic Daily Quests', total: 3, completed: 0, xp: 25000 },
+            { name: 'Milestone Challenges', total: 20, completed: 0, xp: 15000 },
+            { name: 'Expertise Quests', total: 25, completed: 0, xp: 25000 }
         ];
 
         function updateChallenges() {
