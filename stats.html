@@ -353,7 +353,7 @@
     <div class="search-container">
         <div class="search-type-toggle">
             <button class="toggle-btn active" onclick="toggleSearchType('id')">Search by ID</button>
-            <button class="toggle-btn" onclick="toggleSearchType('name')">Search by Username</button>
+            <!-- <button class="toggle-btn" onclick="toggleSearchType('name')">Search by Username</button> -->
         </div>
         <div class="search-box">
             <input type="text" class="search-input" placeholder="Enter Account ID..." id="accountInput">
@@ -387,9 +387,9 @@
 
     <div id="statsContainer" class="stats-container"></div>
     
-    <button id="downloadBtn" class="download-btn" onclick="downloadStats()">Download Stats Image</button>
+    <!-- <button id="downloadBtn" class="download-btn" onclick="downloadStats()">Download Stats Image</button> -->
     
-    <button class="download-btn" onclick="downloadStats()" style="display: none;">Download Stats Image</button>
+    <!-- <button class="download-btn" onclick="downloadStats()" style="display: none;">Download Stats Image</button> -->
 
     <a href="index.html" class="back-button">
         Back to Hub
@@ -468,7 +468,7 @@
                 if (data && data.data) {
                     displayAccountInfo(data.data);
                     displayStats(data.data);
-                    document.getElementById('downloadBtn').style.display = 'block';
+                    // document.getElementById('downloadBtn').style.display = 'block';
                 }
             } catch (error) {
                 statsContainer.innerHTML = `
@@ -477,7 +477,7 @@
                     </div>
                 `;
                 document.getElementById('accountInfo').style.display = 'none';
-                document.getElementById('downloadBtn').style.display = 'none';
+                // document.getElementById('downloadBtn').style.display = 'none';
             }
         }
 
