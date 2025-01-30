@@ -54,8 +54,8 @@
 
         .stats-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: clamp(0.5rem, 2vw, 1rem);
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.75rem;
             margin-top: 1.5rem;
         }
 
@@ -80,7 +80,7 @@
         }
 
         .stat-value {
-            font-size: 1.5rem;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
             font-weight: 600;
             color: var(--primary);
         }
@@ -89,7 +89,7 @@
             background: var(--surface);
             padding: clamp(1rem, 3vw, 1.5rem);
             position: sticky;
-            top: 90px;
+            top: clamp(80px, 12vw, 90px);
             z-index: 90;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
@@ -118,17 +118,19 @@
 
         .filters {
             display: flex;
-            gap: clamp(0.4rem, 1vw, 0.75rem);
             margin-top: 1.5rem;
             flex-wrap: wrap;
-            justify-content: center;
+            gap: 0.5rem;
+            justify-content: flex-start;
         }
 
         .filter-button {
             background-color: rgba(255, 255, 255, 0.05);
             color: var(--text);
             border: none;
-            padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(0.8rem, 2vw, 1.25rem);
+            padding: 0.6rem 1rem;
+            min-height: 48px;
+            min-width: 48px;
             font-size: clamp(0.7rem, 1.5vw, 0.9rem);
             white-space: nowrap;
             border-radius: 8px;
@@ -178,8 +180,8 @@
 
         .cosmetics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
-            gap: clamp(1rem, 3vw, 2rem);
+            grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+            gap: 1.25rem;
             margin-bottom: 3rem;
         }
 
@@ -304,8 +306,8 @@
         .modal-content {
             background: var(--surface);
             border-radius: 20px;
-            width: min(95%, 800px);
-            max-height: 90vh;
+            width: min(98%, 800px);
+            max-height: 95vh;
             overflow-y: auto;
             max-width: 800px;
             position: relative;
@@ -328,15 +330,18 @@
         .modal-header {
             display: flex;
             align-items: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 1.5rem;
             padding: clamp(1rem, 3vw, 2rem);
             background: linear-gradient(45deg, var(--surface), rgba(26,26,26,0.8));
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
         .modal-image {
-            width: clamp(60px, 15vw, 100px);
-            height: clamp(60px, 15vw, 100px);
-            margin-right: clamp(1rem, 3vw, 2rem);
+            margin: 0 auto 1rem;
+            width: clamp(80px, 25vw, 120px);
+            height: clamp(80px, 25vw, 120px);
             border-radius: 12px;
             object-fit: cover;
         }
@@ -385,7 +390,7 @@
 
         .details-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr));
             gap: clamp(0.8rem, 2vw, 1.5rem);
         }
 
@@ -576,6 +581,98 @@
             }
         }
 
+        @media (max-width: 640px) {
+            .header {
+                padding: 1rem;
+                position: relative;
+            }
+
+            .search-section {
+                position: relative;
+                top: 0;
+            }
+
+            .filters {
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+                justify-content: flex-start;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+
+            .filters::-webkit-scrollbar {
+                display: none;
+            }
+
+            .sort-container {
+                flex-wrap: wrap;
+                gap: 0.75rem;
+            }
+
+            .cosmetic-card {
+                border-radius: 12px;
+            }
+
+            .cosmetic-info {
+                padding: 1rem;
+            }
+
+            .load-more {
+                bottom: 6rem;
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+
+            .scroll-to-top {
+                bottom: 1.5rem;
+                right: 1rem;
+                padding: 0.75rem 1.25rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .stats-container {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .cosmetics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-item {
+                padding: 1rem;
+            }
+
+            .back-button {
+                bottom: 1rem;
+                left: 1rem;
+                padding: 0.6rem 1rem;
+            }
+        }
+
+        @media (pointer: coarse) {
+            .cosmetic-card {
+                min-height: 160px;
+            }
+
+            button, .filter-button, .sort-button {
+                min-height: 48px;
+                min-width: 48px;
+            }
+        }
+
+        /* Landscape orientation adjustments */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .modal-content {
+                max-height: 98vh;
+                max-width: 90vw;
+            }
+
+            .modal-body {
+                padding: 1rem;
+            }
+        }
+
         @media (max-width: 380px) {
             .cosmetic-meta {
                 flex-direction: column;
@@ -716,6 +813,34 @@
     </a>
 
     <script>
+        // Add resize observer for dynamic adjustments
+        const resizeObserver = new ResizeObserver(entries => {
+            if (window.innerWidth < 640) {
+                document.querySelector('.header-title').style.textAlign = 'center';
+            } else {
+                document.querySelector('.header-title').style.textAlign = 'left';
+            }
+        });
+
+        resizeObserver.observe(document.body);
+
+        // Update items per page based on screen size
+        function updateItemsPerPage() {
+            const screenWidth = window.innerWidth;
+            if (screenWidth < 400) return 50;
+            if (screenWidth < 768) return 75;
+            return 100;
+        }
+
+        // Modify renderCosmetics function
+        function renderCosmetics(reset = false) {
+            const itemsPerPage = updateItemsPerPage();
+            // Rest of the existing function
+        }
+
+        // Add touch prevention for hover states
+        document.addEventListener('touchstart', function() {}, true);
+        
         let allCosmetics = [];
         let currentFilter = 'all';
         let currentSort = 'newest';

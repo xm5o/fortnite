@@ -482,15 +482,6 @@
     </div>
 
     <script>
-        import('./js/settings-manager.js')
-            .then(module => {
-                window.SettingsManager = module.default;
-            })
-            .catch(err => console.error('Error loading settings manager:', err));
-    </script>
-    <script src="js/settings.js"></script>
-
-    <script>
         // Mobile menu toggle
         const menuBtn = document.querySelector('.mobile-menu-btn');
         const sidebar = document.querySelector('.sidebar');

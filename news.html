@@ -32,7 +32,7 @@
 
         .header {
             background-color: var(--surface);
-            padding: 2rem;
+            padding: clamp(1rem, 4vw, 2rem);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -46,7 +46,7 @@
         }
 
         .header-title {
-            font-size: 2.5rem;
+            font-size: clamp(1.8rem, 6vw, 2.5rem);
             background: linear-gradient(45deg, var(--primary), #ff4f8b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -54,18 +54,20 @@
 
         .description {
             max-width: 1400px;
-            margin: 2rem auto;
-            padding: 0 1.5rem;
+            padding: 0 clamp(1rem, 4vw, 2rem);
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            margin: clamp(1rem, 4vw, 2rem) auto;
             text-align: center;
-            font-size: 1.2rem;
             color: var(--text-secondary);
         }
 
         .tabs {
             display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin: clamp(1rem, 4vw, 2rem) auto;
+            padding: 0 clamp(1rem, 4vw, 2rem);
             justify-content: center;
-            gap: 1rem;
-            margin: 2rem auto;
         }
 
         .tab-button {
@@ -80,7 +82,9 @@
             background-color: rgba(255, 255, 255, 0.05);
             color: var(--text);
             border: none;
-            padding: 0.75rem 1.25rem;
+            padding: clamp(0.6rem, 2vw, 0.75rem) clamp(1rem, 3vw, 1.25rem);
+            min-width: 120px;
+            text-align: center;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -115,6 +119,7 @@
 
         .news-section {
             max-width: 1400px;
+            padding: 0 clamp(1rem, 4vw, 2rem);
             margin: 2rem auto;
             display: none;
         }
@@ -125,14 +130,14 @@
 
         .news-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+            gap: clamp(1rem, 3vw, 2rem);
             margin-top: 2rem;
         }
 
         .news-card {
             background: var(--surface);
-            border-radius: 16px;
+            border-radius: clamp(12px, 2vw, 16px);
             overflow: hidden;
             transition: all 0.3s ease;
             text-align: center;
@@ -145,16 +150,16 @@
 
         .news-card img {
             width: 100%;
-            height: 200px;
+            height: clamp(180px, 40vw, 240px);
             object-fit: cover;
         }
 
         .news-content {
-            padding: 1.5rem;
+            padding: clamp(1rem, 3vw, 1.5rem);
         }
 
         .news-content h2 {
-            font-size: 1.5rem;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
             color: var(--primary);
             margin-bottom: 1rem;
         }
@@ -165,14 +170,35 @@
             line-height: 1.5;
         }
 
+        .loading, .error {
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--primary);
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         .back-button {
             position: fixed;
-            bottom: 2rem;
-            right: 2rem;
+            bottom: clamp(1rem, 4vw, 2rem);
+            right: clamp(1rem, 4vw, 2rem);
+            padding: clamp(0.6rem, 2vw, 0.75rem) clamp(1rem, 3vw, 1.25rem);
             background-color: rgba(255, 255, 255, 0.05);
             color: var(--text);
             border: none;
-            padding: 0.75rem 1.25rem;
             text-decoration: none;
             border-radius: 8px;
             cursor: pointer;
@@ -208,6 +234,56 @@
             .news-grid {
                 grid-template-columns: 1fr;
             }
+
+            .tabs {
+                flex-direction: row;
+                overflow-x: auto;
+                justify-content: flex-start;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+
+            .tabs::-webkit-scrollbar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tab-button {
+                min-width: 100px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (pointer: coarse) {
+            .news-card:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .tab-button, .back-button {
+                min-height: 48px;
+                min-width: 48px;
+            }
+        }
+
+        /* Accessibility improvements */
+        [role="tablist"] {
+            gap: 0.5rem;
+        }
+
+        [role="tab"]:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        .news-card:focus-within {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
         }
     </style>
 </head>
@@ -222,27 +298,37 @@
         Stay updated with the latest news from Fortnite! Choose a category below to explore Battle Royale, Save the World, and Creative news.
     </div>
 
-    <div class="tabs">
-        <a class="tab-button active" data-tab="br">Battle Royale</a>
-        <a class="tab-button" data-tab="stw">Save the World</a>
-        <a class="tab-button" data-tab="creative">Creative</a>
+    <div class="tabs" role="tablist">
+        <a class="tab-button active" role="tab" data-tab="br" aria-selected="true">Battle Royale</a>
+        <a class="tab-button" role="tab" data-tab="stw" aria-selected="false">Save the World</a>
+        <a class="tab-button" role="tab" data-tab="creative" aria-selected="false">Creative</a>
     </div>
 
-    <div id="br" class="news-section active">
+    <!-- News sections updated with loading states -->
+    <div id="br" class="news-section active" role="tabpanel">
         <div class="news-grid" id="br-grid">
-            <div class="loading">Loading Battle Royale News...</div>
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                Loading Battle Royale News...
+            </div>
         </div>
     </div>
 
-    <div id="stw" class="news-section">
+    <div id="stw" class="news-section" role="tabpanel">
         <div class="news-grid" id="stw-grid">
-            <div class="loading">Loading Save the World News...</div>
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                Loading Save the World News...
+            </div>
         </div>
     </div>
 
-    <div id="creative" class="news-section">
+    <div id="creative" class="news-section" role="tabpanel">
         <div class="news-grid" id="creative-grid">
-            <div class="loading">Loading Creative News...</div>
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                Loading Creative News...
+            </div>
         </div>
     </div>
 
@@ -258,15 +344,26 @@
         };
 
         async function fetchNews(type) {
+            const grid = document.getElementById(`${type}-grid`);
             try {
+                grid.innerHTML = `
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        Loading ${type.toUpperCase()} News...
+                    </div>`;
+                
                 const response = await fetch(newsEndpoints[type]);
-                if (!response.ok) throw new Error('Failed to fetch news');
-
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
                 const data = await response.json();
                 displayNews(type, data.data);
             } catch (error) {
                 console.error('Error fetching news:', error);
-                document.getElementById(`${type}-grid`).innerHTML = '<div class="error">Failed to load news. Please try again later.</div>';
+                grid.innerHTML = `
+                    <div class="error">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Failed to load news. Please try again later.
+                    </div>`;
             }
         }
 
@@ -274,37 +371,70 @@
             const grid = document.getElementById(`${type}-grid`);
             grid.innerHTML = '';
 
-            if (!newsData || !newsData.motds || newsData.motds.length === 0) {
-                grid.innerHTML = '<div class="error">No news available.</div>';
+            if (!newsData?.motds?.length) {
+                grid.innerHTML = `
+                    <div class="error">
+                        <i class="fas fa-info-circle"></i>
+                        No news available for this category.
+                    </div>`;
                 return;
             }
 
             newsData.motds.forEach(item => {
-                const card = document.createElement('div');
+                const card = document.createElement('article');
                 card.className = 'news-card';
+                card.tabIndex = 0;
                 card.innerHTML = `
-                    <img src="${item.image}" alt="${item.title}">
+                    <img src="${item.image}" alt="${item.title}" loading="lazy">
                     <div class="news-content">
                         <h2>${item.title}</h2>
                         <p>${item.body}</p>
-                    </div>
-                `;
+                    </div>`;
                 grid.appendChild(card);
             });
         }
 
-        const tabs = document.querySelectorAll('.tab-button');
+        // Tab handling with keyboard support
+        const tabs = document.querySelectorAll('[role="tab"]');
         tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                tabs.forEach(btn => btn.classList.remove('active'));
-                tab.classList.add('active');
-
-                document.querySelectorAll('.news-section').forEach(section => section.classList.remove('active'));
-                document.getElementById(tab.dataset.tab).classList.add('active');
+            tab.addEventListener('click', switchTab);
+            tab.addEventListener('keydown', e => {
+                if (['Enter', 'Space'].includes(e.code)) switchTab(e);
             });
         });
 
-        Object.keys(newsEndpoints).forEach(fetchNews);
+        function switchTab(e) {
+            const tab = e.target.closest('[role="tab"]');
+            if (!tab) return;
+
+            tabs.forEach(t => {
+                t.classList.remove('active');
+                t.setAttribute('aria-selected', 'false');
+            });
+
+            tab.classList.add('active');
+            tab.setAttribute('aria-selected', 'true');
+
+            document.querySelectorAll('[role="tabpanel"]').forEach(panel => 
+                panel.classList.remove('active')
+            );
+            document.getElementById(tab.dataset.tab).classList.add('active');
+            
+            // Lazy load content when tab becomes active
+            if (!document.getElementById(`${tab.dataset.tab}-grid`).children.length > 1) {
+                fetchNews(tab.dataset.tab);
+            }
+        }
+
+        // Initial load
+        document.querySelectorAll('[role="tabpanel"]').forEach(panel => {
+            if (panel.classList.contains('active')) {
+                fetchNews(panel.id);
+            }
+        });
+
+        // Touch device detection
+        document.addEventListener('touchstart', function() {}, { once: true });
     </script>
 </body>
 </html>
