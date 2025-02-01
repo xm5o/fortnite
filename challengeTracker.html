@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fortnite Challenge Tracker</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #007bff;
+            --primary-dark: #0056b3;
+            --surface: #1a1a1a;
+            --surface-hover: #2a2a2a;
+            --text: #ffffff;
+            --text-secondary: #999999;
+            --sidebar-width: 250px;
+            --progress-bg: #2a2a2a;
+            --progress-fill: #007bff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--surface);
+            padding: 1rem;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            list-style: none;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            color: var(--text);
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-link i {
+            margin-right: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--surface-hover);
+            color: var(--primary);
+        }
+
+        .mobile-menu-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            background: var(--surface);
+            border: none;
+            color: var(--text);
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            display: none;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+        }
+
+        .challenges-header {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://fnggcdn.com/assets/YhEONm.png');
+            background-size: cover;
+            background-position: center;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+        }
+
+        .challenges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .challenge-section {
+            background-color: var(--surface);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            color: var(--text);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .challenge-card {
+            background-color: var(--surface-hover);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .challenge-name {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .challenge-progress {
+            width: 100%;
+            height: 8px;
+            background-color: var(--progress-bg);
+            border-radius: 4px;
+            margin: 0.5rem 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--progress-fill);
+            transition: width 0.3s ease;
+        }
+
+        .challenge-info {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .challenge-reward {
+            display: flex;
+            align-items: center;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .xp-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.5rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--primary);
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        .bundle-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .bundle-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            margin-right: 1rem;
+            object-fit: cover;
+        }
+
+        .bundle-details {
+            flex-grow: 1;
+        }
+
+        .bundle-title {
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+
+        .bundle-progress {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+                padding-top: 4rem;
+            }
+
+            .challenges-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="mobile-menu-btn">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">Fortnite Hub</div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html" class="nav-link active"><i class="fas fa-home"></i> Home</a></li>
+            <li><a class="nav-link coming"><i class="fas fa-shop"></i> Shop</a></li>
+            <li><a class="nav-link coming"><i class="fas fa-tasks"></i> Challenges</a></li>
+            <li><a href="cosmetics.html" class="nav-link"><i class="fas fa-tshirt"></i> Cosmetics</a></li>
+            <li><a href="map.html" class="nav-link"><i class="fas fa-map"></i> Map</a></li>
+            <li><a href="news.html" class="nav-link"><i class="fas fa-newspaper"></i> News</a></li>
+            <li><a href="stats.html" class="nav-link"><i class="fas fa-chart-bar"></i> Stats</a></li>
+            <li><a href="battlepass.html" class="nav-link"><i class="fas fa-star"></i> Battle Pass Tracker</a></li>
+            <li><a href="aes.html" class="nav-link"><i class="fas fa-key"></i> AES Keys</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <section class="challenges-header">
+            <h1>Challenge Tracker</h1>
+            <p>Track your progress on all active Fortnite challenges!</p>
+        </section>
+
+        <section class="challenge-section">
+            <h2 class="section-title">Weekly Challenges</h2>
+            <div id="weekly-challenges" class="challenges-grid">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    Loading challenges...
+                </div>
+            </div>
+        </section>
+
+        <section class="challenge-section">
+            <h2 class="section-title">Event Challenges</h2>
+            <div id="event-challenges" class="challenges-grid">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    Loading challenges...
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Mobile menu toggle code remains the same
+        const menuBtn = document.querySelector('.mobile-menu-btn');
+        const sidebar = document.querySelector('.sidebar');
+
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(e.target) && 
+                !menuBtn.contains(e.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        async function fetchChallenges() {
+            try {
+                const response = await fetch('https://fortniteapi.io/v3/challenges?season=current&lang=en', {
+                    headers: {
+                        'Authorization': '800db77e-03418ea1-45ab2151-904622e2'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('API Response:', data); // Debug log
+
+                if (!data.result) {
+                    throw new Error('API returned unsuccessful result');
+                }
+
+                // Process the challenges data
+                const processedChallenges = processChallengesData(data);
+                displayChallenges(processedChallenges);
+            } catch (error) {
+                console.error('Error fetching challenges:', error);
+                const errorMessage = '<div class="error">Failed to load challenges. Please try again later.</div>';
+                document.getElementById('weekly-challenges').innerHTML = errorMessage;
+                document.getElementById('event-challenges').innerHTML = errorMessage;
+            }
+        }
+
+        function processChallengesData(data) {
+            // Initialize arrays for different challenge types
+            const weeklyBundles = [];
+            const eventBundles = [];
+
+            // Process each challenge category from the API response
+            Object.entries(data.quests || {}).forEach(([category, challenges]) => {
+                if (!challenges) return;
+
+                // Create a bundle object
+                const bundle = {
+                    name: category,
+                    image: 'https://fortnite-api.com/images/cosmetics/br/placeholder.png', // Default image
+                    quests: []
+                };
+
+                // Process challenges
+                if (Array.isArray(challenges)) {
+                    bundle.quests = challenges.map(challenge => ({
+                        name: challenge.name || 'Unknown Challenge',
+                        progress: challenge.progress || 0,
+                        target: challenge.target || 1,
+                        completed: challenge.completed || false,
+                        xp: challenge.xp || 0
+                    }));
+                }
+
+                // Sort into weekly or event challenges
+                if (category.toLowerCase().includes('week')) {
+                    weeklyBundles.push(bundle);
+                } else {
+                    eventBundles.push(bundle);
+                }
+            });
+
+            return {
+                weekly: weeklyBundles,
+                events: eventBundles
+            };
+        }
+
+        function displayChallenges(challenges) {
+            const weeklyContainer = document.getElementById('weekly-challenges');
+            const eventContainer = document.getElementById('event-challenges');
+            
+            weeklyContainer.innerHTML = '';
+            eventContainer.innerHTML = '';
+
+            // Display weekly challenges
+            if (challenges.weekly.length > 0) {
+                challenges.weekly.forEach(bundle => {
+                    weeklyContainer.appendChild(createBundleElement(bundle));
+                });
+            } else {
+                weeklyContainer.innerHTML = '<div class="no-challenges">No weekly challenges available</div>';
+            }
+
+            // Display event challenges
+            if (challenges.events.length > 0) {
+                challenges.events.forEach(bundle => {
+                    eventContainer.appendChild(createBundleElement(bundle));
+                });
+            } else {
+                eventContainer.innerHTML = '<div class="no-challenges">No event challenges available</div>';
+            }
+        }
+
+        function createBundleElement(bundle) {
+            const bundleDiv = document.createElement('div');
+            bundleDiv.className = 'challenge-bundle';
+
+            const completedQuests = bundle.quests ? bundle.quests.filter(quest => quest.completed).length : 0;
+            const totalQuests = bundle.quests ? bundle.quests.length : 0;
+            const progressPercentage = totalQuests > 0 ? (completedQuests / totalQuests) * 100 : 0;
+
+            const bundleContent = `
+                <div class="bundle-info">
+                    <img class="bundle-image" src="${bundle.image}" alt="${bundle.name}" 
+                         onerror="this.src='https://fortnite-api.com/images/cosmetics/br/placeholder.png'">
+                    <div class="bundle-details">
+                        <div class="bundle-title">${bundle.name}</div>
+                        <div class="bundle-progress">${completedQuests}/${totalQuests} Completed</div>
+                    </div>
+                </div>
+                ${bundle.quests ? bundle.quests.map(quest => createQuestElement(quest)).join('') : ''}
+            `;
+
+            bundleDiv.innerHTML = bundleContent;
+            return bundleDiv;
+        }
+
+        function createQuestElement(quest) {
+            const progress = quest.progress || 0;
+            const target = quest.target || 1;
+            const progressPercentage = (progress / target) * 100;
+
+            return `
+                <div class="challenge-card">
+                    <div class="challenge-name">${quest.name}</div>
+                    <div class="challenge-progress">
+                        <div class="progress-bar" style="width: ${progressPercentage}%"></div>
+                    </div>
+                    <div class="challenge-info">
+                        <span>${progress}/${target}</span>
+                        <div class="challenge-reward">
+                            <img class="xp-icon" src="https://fortnite-api.com/images/xp.png" alt="XP">
+                            ${quest.xp.toLocaleString()} XP
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize
+        fetchChallenges();
+        
+        // Refresh challenges every 5 minutes
+        setInterval(fetchChallenges, 300000);
+    </script>
+</body>
+</html>
