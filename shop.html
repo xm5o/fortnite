@@ -280,7 +280,7 @@
             <p>Browse today's available items in the Fortnite Item Shop!</p>
         </section>
 
-        <section class="shop-section">
+        <!-- <section class="shop-section">
             <h2 class="section-title">Featured Items</h2>
             <div id="featured-items" class="shop-grid">
                 <div class="loading">
@@ -298,11 +298,18 @@
                     Loading shop items...
                 </div>
             </div>
-        </section>
+        </section> -->
+
+        <div id="shop-sections-container">
+            <!-- Sections will be dynamically inserted here -->
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                Loading shop items...
+            </div>
+        </div>
     </div>
 
     <script>
-        // Mobile menu toggle
         const menuBtn = document.querySelector('.mobile-menu-btn');
         const sidebar = document.querySelector('.sidebar');
 
@@ -310,7 +317,6 @@
             sidebar.classList.toggle('active');
         });
 
-        // Close sidebar when clicking outside on mobile
         document.addEventListener('click', (e) => {
             if (window.innerWidth <= 768 && 
                 !sidebar.contains(e.target) && 
@@ -319,57 +325,122 @@
             }
         });
 
-        // Fetch shop data
+        // Updated fetch function
         async function fetchShopData() {
             try {
-                const response = await fetch('https://fortniteapi.io/v2/shop?lang=en', {
+                const response = await fetch('https://fortnite-api.com/v2/shop', {
                     headers: {
-                        'Authorization': '800db77e-03418ea1-45ab2151-904622e2'
+                        'Authorization': 'ac134d74-7783-4e98-aeca-33a02c2c4834'
                     }
                 });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 
                 const data = await response.json();
-                console.log('API Response:', data);
-                
-                if (!data.result) {
-                    throw new Error('API returned unsuccessful result');
-                }
+                if (data.status !== 200) throw new Error('API returned unsuccessful response');
 
-                // Process and display shop items
-                const processedItems = processShopData(data.shop);
-                displayShopItems(processedItems);
-                } catch (error) {
-                    console.error('Error fetching shop data:', error);
-                    const errorMessage = '<div class="error">Failed to load shop items. Please try again later.</div>';
-                    document.getElementById('featured-items').innerHTML = errorMessage;
-                    document.getElementById('daily-items').innerHTML = errorMessage;
-                }
+                processAndDisplayShopData(data.data);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('shop-sections-container').innerHTML = 
+                    '<div class="error">Failed to load shop. Please try again later.</div>';
+            }
         }
 
-        function processShopData(items) {
+        function processAndDisplayShopData(shopData) {
+            const sectionsContainer = document.getElementById('shop-sections-container');
+            sectionsContainer.innerHTML = '';
+
+            // Access the correct data structure
+            const sections = shopData?.shop?.sections || [];
+            
+            if (sections.length === 0) {
+                sectionsContainer.innerHTML = '<div class="no-items">No shop sections available</div>';
+                return;
+            }
+
+            // Process all sections
+            sections.forEach(section => {
+                const sectionElement = createShopSection(section);
+                sectionsContainer.appendChild(sectionElement);
+            });
+        }
+
+        function createShopSection(sectionData) {
+            const sectionDiv = document.createElement('div');
+            sectionDiv.className = 'shop-section';
+
+            const title = document.createElement('h2');
+            title.className = 'section-title';
+            title.textContent = sectionData.name;
+
+            const grid = document.createElement('div');
+            grid.className = 'shop-grid';
+
+            // Safely handle entries
+            const entries = sectionData?.entries || [];
+            entries.forEach(entry => {
+                const items = entry?.items || [];
+                items.forEach(item => {
+                    grid.appendChild(createItemCard({
+                        ...item,
+                        section: sectionData.name,
+                        finalPrice: item.price
+                    }));
+                });
+            });
+
+            if (grid.children.length === 0) {
+                grid.innerHTML = '<div class="no-items">No items in this section</div>';
+            }
+
+            sectionDiv.appendChild(title);
+            sectionDiv.appendChild(grid);
+            return sectionDiv;
+        }
+
+        // Updated data processor
+        function processShopData(shopData) {
+            const items = [];
+            
+            // Process featured items
+            if (shopData.featured?.entries) {
+                shopData.featured.entries.forEach(entry => {
+                    entry.items.forEach(item => {
+                        items.push({
+                            ...item,
+                            section: 'Featured',
+                            finalPrice: item.price
+                        });
+                    });
+                });
+            }
+
+            // Process daily items
+            if (shopData.daily?.entries) {
+                shopData.daily.entries.forEach(entry => {
+                    entry.items.forEach(item => {
+                        items.push({
+                            ...item,
+                            section: 'Daily',
+                            finalPrice: item.price
+                        });
+                    });
+                });
+            }
+
             return items.map(item => ({
-                name: item.name || 'Unknown Item',
-                price: item.finalPrice || item.price || 0,
-                image: item.icon || item.images?.icon || item.image,
-                rarity: getRarityString(item),
-                section: item.section?.name || item.section || 'Other',
-                sectionId: item.section?.id || item.section || 'other',
+                name: item.name,
+                price: item.finalPrice || 0,
+                image: item.images?.icon,
+                rarity: item.rarity?.value || 'common',
+                section: item.section,
                 description: item.description || '',
-                type: item.type || 'Item'
+                type: item.type?.value || 'Item'
             }));
         }
 
-        function getRarityString(item) {
-            if (typeof item.rarity === 'string') return item.rarity;
-            if (item.rarity?.name) return item.rarity.name;
-            if (item.rarity?.id) return item.rarity.id;
-            return 'common';
-        }
-
+        // Rarity class mapping (unchanged)
         function getRarityClass(rarity) {
             const rarityMap = {
                 common: 'rarity-common',
@@ -381,57 +452,7 @@
             return rarityMap[rarity.toLowerCase()] || 'rarity-common';
         }
 
-        // Display shop items
-        // function displayShopItems(items) {
-        //     const featuredContainer = document.getElementById('featured-items');
-        //     const dailyContainer = document.getElementById('daily-items');
-            
-        //     featuredContainer.innerHTML = '';
-        //     dailyContainer.innerHTML = '';
-
-        //     const featured = items.filter(item => 
-        //         item.sectionId.toLowerCase().includes('featured') ||
-        //         item.section.toLowerCase().includes('featured'));
-            
-        //     const daily = items.filter(item => 
-        //         item.sectionId.toLowerCase().includes('daily') ||
-        //         item.section.toLowerCase().includes('daily'));
-
-        //     // Display items in their respective containers
-        //     featured.forEach(item => {
-        //         featuredContainer.appendChild(createItemCard(item));
-        //     });
-
-        //     daily.forEach(item => {
-        //         dailyContainer.appendChild(createItemCard(item));
-        //     });
-
-        //     if (featured.length === 0) {
-        //         featuredContainer.innerHTML = '<div class="no-items">No featured items available</div>';
-        //     }
-        //     if (daily.length === 0) {
-        //         dailyContainer.innerHTML = '<div class="no-items">No daily items available</div>';
-        //     }
-
-        //     items.forEach(item => {
-        //         const card = createItemCard(item);
-                
-        //         if (item.section.id === 'Featured') {
-        //             featuredContainer.appendChild(card);
-        //         } else if (item.section.id === 'Daily') {
-        //             dailyContainer.appendChild(card);
-        //         }
-        //     });
-
-        //     // If no items were found for a section, display a message
-        //     if (featuredContainer.children.length === 0) {
-        //         featuredContainer.innerHTML = '<div class="no-items">No featured items available</div>';
-        //     }
-        //     if (dailyContainer.children.length === 0) {
-        //         dailyContainer.innerHTML = '<div class="no-items">No daily items available</div>';
-        //     }
-        // }
-
+        // Display function (unchanged)
         function displayShopItems(items) {
             const featuredContainer = document.getElementById('featured-items');
             const dailyContainer = document.getElementById('daily-items');
@@ -440,14 +461,13 @@
             dailyContainer.innerHTML = '';
 
             items.forEach(item => {
-                if (item.section.toLowerCase().includes('featured')) {
+                if (item.section.toLowerCase() === 'featured') {
                     featuredContainer.appendChild(createItemCard(item));
-                } else if (item.section.toLowerCase().includes('daily')) {
+                } else if (item.section.toLowerCase() === 'daily') {
                     dailyContainer.appendChild(createItemCard(item));
                 }
             });
 
-            // Handle empty sections
             if (featuredContainer.children.length === 0) {
                 featuredContainer.innerHTML = '<div class="no-items">No featured items available</div>';
             }
@@ -456,31 +476,32 @@
             }
         }
 
-        // Create item card
+        // Item card creator (unchanged)
         function createItemCard(item) {
             const card = document.createElement('div');
-            card.className = `item-card ${getRarityClass(item.rarity)}`;
+            card.className = `item-card ${getRarityClass(item.rarity?.value || 'common')}`;
             
             const fallbackImage = 'https://fortnite-api.com/images/cosmetics/br/placeholder.png';
             
             card.innerHTML = `
-                <div class="item-section">${item.section}</div>
                 <img class="item-image" 
-                     src="${item.image || fallbackImage}" 
+                     src="${item.images?.icon || fallbackImage}" 
                      alt="${item.name}"
                      onerror="this.src='${fallbackImage}'">
                 <div class="item-info">
                     <div class="item-name">${item.name}</div>
                     <div class="item-rarity">
-                        <span class="rarity-icon ${getRarityClass(item.rarity)}"></span>
-                        ${item.rarity.charAt(0).toUpperCase() + item.rarity.slice(1)}
+                        <span class="rarity-icon ${getRarityClass(item.rarity?.value || 'common')}"></span>
+                        ${(item.rarity?.value || 'Common').toUpperCase()}
                     </div>
-                    <div class="item-price">
-                        <img class="vbucks-icon" 
-                             src="https://fortnite-api.com/images/vbucks.png" 
-                             alt="V-Bucks"
-                             onerror="this.style.display='none'">
-                        ${item.price}
+                    <div class="item-meta">
+                        <div class="item-price">
+                            <img class="vbucks-icon" 
+                                src="https://fortnite-api.com/images/vbucks.png" 
+                                alt="V-Bucks">
+                            ${item.finalPrice || 0}
+                        </div>
+                        <div class="item-type">${item.type?.value || 'Item'}</div>
                     </div>
                 </div>
             `;
@@ -488,10 +509,24 @@
             return card;
         }
 
+        const style = document.createElement('style');
+        style.textContent = `
+            .item-meta {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 0.5rem;
+            }
+            .item-type {
+                font-size: 0.8rem;
+                color: var(--text-secondary);
+            }
+        `;
+        document.head.appendChild(style);
+
         // Initialize
         fetchShopData();
-
-        setInterval(fetchShopData, 300000);
+        setInterval(fetchShopData, 300000); // Refresh every 5 minutes
     </script>
 </body>
 </html>

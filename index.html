@@ -165,6 +165,95 @@
             color: var(--primary);
         }
 
+        .challenges-section {
+            background-color: var(--surface);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .challenges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .challenge-card {
+            background: var(--surface-hover);
+            border-radius: 12px;
+            padding: 1.25rem;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .challenge-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .challenge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .challenge-title {
+            font-size: 1.1rem;
+            color: var(--text);
+            margin: 0;
+        }
+
+        .challenge-xp {
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .challenge-description {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .challenge-progress {
+            height: 8px;
+            background: var(--surface);
+            border-radius: 4px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .challenge-progress-bar {
+            height: 100%;
+            background: linear-gradient(45deg, var(--primary), #ff4f8b);
+            width: 0;
+            transition: width 0.3s ease;
+        }
+
+        .challenge-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Loading and error states */
+        .challenges-loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .challenges-error {
+            background: rgba(255, 0, 0, 0.1);
+            color: #ff4444;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
         /* News Preview */
         .news-preview {
             display: grid;
@@ -244,6 +333,10 @@
 
             .welcome-section {
                 padding: 1.5rem;
+            }
+
+            .challenges-grid {
+                grid-template-columns: 1fr;
             }
 
             .features-grid {
@@ -385,7 +478,7 @@
         </div>
         <ul class="nav-links">
             <li><a href="index.html" class="nav-link active"><i class="fas fa-home"></i> Home</a></li>
-            <li><a class="nav-link coming"><i class="fas fa-shop"></i> Shop</a></li>
+            <li><a href="shop.html" class="nav-link"><i class="fas fa-shop"></i> Shop</a></li>
             <li><a class="nav-link coming"><i class="fas fa-tasks"></i> Challenges</a></li>
             <li><a href="cosmetics.html" class="nav-link"><i class="fas fa-tshirt"></i> Cosmetics</a></li>
             <li><a href="map.html" class="nav-link"><i class="fas fa-map"></i> Map</a></li>
@@ -419,6 +512,19 @@
                 <div class="loading">
                     <div class="loading-spinner"></div>
                     Loading cosmetics...
+                </div>
+            </div>
+        </section>
+
+        <section class="challenges-section">
+            <div class="section-header">
+                <h2>Weekly Challenges</h2>
+                <a href="challenges.html" class="view-all">View All</a>
+            </div>
+            <div class="challenges-grid" id="weekly-challenges">
+                <div class="challenges-loading">
+                    <div class="loading-spinner"></div>
+                    Loading challenges...
                 </div>
             </div>
         </section>
@@ -591,6 +697,59 @@
                 container.appendChild(card);
             });
         }
+
+        async function fetchWeeklyChallenges() {
+            try {
+                const response = await fetch('https://fortnite-api.com/v2/challenges/br/current', {
+                    headers: {
+                        'Authorization': 'ac134d74-7783-4e98-aeca-33a02c2c4834'
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Failed to fetch challenges');
+                
+                const data = await response.json();
+                displayChallenges(data.data.entries);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('weekly-challenges').innerHTML = `
+                    <div class="challenges-error">
+                        <p>Failed to load challenges. Please try again later.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function displayChallenges(challenges) {
+            const container = document.getElementById('weekly-challenges');
+            container.innerHTML = '';
+
+            challenges.slice(0, 6).forEach(challenge => {
+                const progress = Math.floor(Math.random() * 100); // Simulate progress for demo
+                const card = document.createElement('div');
+                card.className = 'challenge-card';
+                
+                card.innerHTML = `
+                    <div class="challenge-header">
+                        <h3 class="challenge-title">${challenge.name}</h3>
+                        <div class="challenge-xp">${challenge.xpReward} XP</div>
+                    </div>
+                    <p class="challenge-description">${challenge.description}</p>
+                    <div class="challenge-progress">
+                        <div class="challenge-progress-bar" style="width: ${progress}%"></div>
+                    </div>
+                    <div class="challenge-meta">
+                        <span>Week ${challenge.week || 'Current'}</span>
+                        <span>${progress}% Complete</span>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        // Call this function when the page loads
+        document.addEventListener('DOMContentLoaded', fetchWeeklyChallenges);
 
         // Modified news fetch function
         async function fetchLatestNews() {
