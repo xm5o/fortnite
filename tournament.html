@@ -156,7 +156,7 @@
             z-index: 1001;
         }
 
-        /* @media (max-width: 768px) {
+        @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
             }
@@ -178,7 +178,7 @@
             .tournaments-grid {
                 grid-template-columns: 1fr;
             }
-        } */
+        }
 
         .tournament-header {
             display: flex;
@@ -239,8 +239,8 @@
         </div>
         <ul class="nav-links">
             <li><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
-            <li><a class="nav-link coming"><i class="fas fa-shop"></i> Shop</a></li>
-            <li><a class="nav-link coming"><i class="fas fa-tasks"></i> Challenges</a></li>
+            <li><a href="shop.html" class="nav-link"><i class="fas fa-shop"></i> Shop</a></li>
+            <li><a href="challengeTracker.html" class="nav-link"><i class="fas fa-tasks"></i> Challenges</a></li>
             <li><a href="cosmetics.html" class="nav-link"><i class="fas fa-tshirt"></i> Cosmetics</a></li>
             <li><a href="map.html" class="nav-link"><i class="fas fa-map"></i> Map</a></li>
             <li><a href="news.html" class="nav-link"><i class="fas fa-newspaper"></i> News</a></li>
@@ -268,15 +268,6 @@
 
         menuBtn.addEventListener('click', () => {
             sidebar.classList.toggle('active');
-        });
-
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', (e) => {
-            if (window.innerWidth <= 768 && 
-                !sidebar.contains(e.target) && 
-                !menuBtn.contains(e.target)) {
-                sidebar.classList.remove('active');
-            }
         });
 
         // API Key and Endpoint

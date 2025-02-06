@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Fortnite Stats Tracker</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
     <style>
-        :root {
+        /* :root {
             --primary: #4fb3ff;
             --primary-dark: #3a8ac2;
             --background: #0a0a0a;
@@ -16,13 +17,13 @@
             --text-secondary: rgba(255, 255, 255, 0.7);
             --success: #00C851;
             --danger: #ff4444;
-        }
+        } */
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
 
         body {
@@ -30,6 +31,24 @@
             color: var(--text);
             line-height: 1.6;
             overflow-x: hidden;
+        }
+
+        .welcome-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('assest/bg3.png');
+            background-size: cover;
+            background-position: center;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+        }
+
+        .welcome-section h1 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            margin-bottom: 1rem;
+        }
+
+        .welcome-section p {
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
         }
 
         .container {
@@ -264,6 +283,10 @@
         }
 
         @media (max-width: 768px) {
+            .welcome-section {
+                padding: 1.5rem;
+            }
+
             .search__input-group {
                 flex-direction: column;
             }
@@ -276,55 +299,101 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        @media (max-width: 480px) {
+            .welcome-section {
+                padding: 1.5rem;
+                margin: 0.5rem;
+            }
+        }
     </style>
 </head>
 <body>
-    <header class="header">
+    <!-- <header class="header">
         <div class="container">
             <h1 class="header__title">Fortnite Stats Tracker</h1>
         </div>
-    </header>
+    </header> -->
 
-    <main class="container">
-        <section class="search-section">
-            <div class="search__toggle">
-                <button class="toggle-btn active" data-type="id" onclick="StatsTracker.setSearchType('id')">
-                    Search by ID
-                </button>
-                <button class="toggle-btn" data-type="name" onclick="StatsTracker.setSearchType('name')">
-                    Search by Name
-                </button>
-            </div>
-            
-            <div class="search__input-group">
-                <input type="text" 
-                       class="search__input" 
-                       id="searchInput"
-                       placeholder="Enter Epic Account ID..."
-                       aria-label="Search player">
-                <button class="search__button" onclick="StatsTracker.searchPlayer()">
-                    <i class="fas fa-search"></i> Search
-                </button>
-            </div>
+    <button class="mobile-menu-btn">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">Fortnite Hub</div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="shop.html" class="nav-link"><i class="fas fa-shop"></i> Shop</a></li>
+            <li><a href="challengeTracker.html" class="nav-link"><i class="fas fa-tasks"></i> Challenges</a></li>
+            <li><a href="cosmetics.html" class="nav-link"><i class="fas fa-tshirt"></i> Cosmetics</a></li>
+            <li><a href="map.html" class="nav-link"><i class="fas fa-map"></i> Map</a></li>
+            <li><a href="news.html" class="nav-link"><i class="fas fa-newspaper"></i> News</a></li>
+            <li><a href="tournament.html" class="nav-link"><i class="fas fa-trophy"></i> Tournaments</a></li>
+            <li><a href="stats.html" class="nav-link active"><i class="fas fa-chart-bar"></i> Stats</a></li>
+            <li><a href="battlepass.html" class="nav-link"><i class="fas fa-star"></i> Battle Pass Tracker</a></li>
+            <li><a href="aes.html" class="nav-link"><i class="fas fa-key"></i> AES Keys</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <section class="welcome-section">
+            <h1>Fortnite - Stats</h1>
+            <p>Your stats here, just enter the informations and see what is your stats!</p>
         </section>
 
-        <section id="accountInfo" class="account-info" hidden></section>
+        <main class="container">
+            <section class="search-section">
+                <div class="search__toggle">
+                    <button class="toggle-btn active" data-type="id" onclick="StatsTracker.setSearchType('id')">
+                        Search by ID
+                    </button>
+                    <button class="toggle-btn" data-type="name" onclick="StatsTracker.setSearchType('name')">
+                        Search by Name
+                    </button>
+                </div>
+                
+                <div class="search__input-group">
+                    <input type="text" 
+                           class="search__input" 
+                           id="searchInput"
+                           placeholder="Enter Epic Account ID..."
+                           aria-label="Search player">
+                    <button class="search__button" onclick="StatsTracker.searchPlayer()">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+            </section>
+    
+            <section id="accountInfo" class="account-info" hidden></section>
+    
+            <section id="statsContainer" class="stats-grid"></section>
+    
+            <div id="loading" class="loading-state" hidden>
+                <div class="loading-spinner"></div>
+                <p>Loading player stats...</p>
+            </div>
+    
+            <div id="errorContainer" class="error-message" hidden></div>
+        </main>
+    </div>
 
-        <section id="statsContainer" class="stats-grid"></section>
+    
 
-        <div id="loading" class="loading-state" hidden>
-            <div class="loading-spinner"></div>
-            <p>Loading player stats...</p>
-        </div>
-
-        <div id="errorContainer" class="error-message" hidden></div>
-    </main>
-
-    <a href="index.html" class="back-button">
+    <!-- <a href="index.html" class="back-button">
         <i class="fas fa-arrow-left"></i> Back to Hub
-    </a>
+    </a> -->
 
     <script>
+        // Mobile menu toggle
+        const menuBtn = document.querySelector('.mobile-menu-btn');
+        const sidebar = document.querySelector('.sidebar');
+
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+        
         class StatsTracker {
             static API_KEY = 'ac134d74-7783-4e98-aeca-33a02c2c4834';
             static BASE_URL = 'https://fortnite-api.com/v2/stats/br/v2/';
